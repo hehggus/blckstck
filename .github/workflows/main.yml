@@ -3,7 +3,7 @@ name: Build Android APK (Capacitor)
 on:
   push:
     branches: [ "main", "master" ]
-  workflow_dispatch: # Позволяет запускать сборку вручную кнопкой
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,15 +16,20 @@ jobs:
     - name: Unpack ZIP Project
       run: |
         unzip project.zip
-        # Если файлы были внутри папки, вытаскиваем их в корень
-        if [ -d "tetris-main" ]; then mv tetris-main/* .; fi
-        if [ -d "react-tetris-main" ]; then mv react-tetris-main/* .; fi
-        rm project.zip
+        # Находим, куда распаковался package.json, и переносим всё в корень
+        TARGET_DIR=$(find . -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;)
+        if [ "$TARGET_DIR" != "." ]; then
+          echo "Файлы найдены в подпапке $TARGET_DIR, переносим в корень..."
+          mv $TARGET_DIR/* . 2>/dev/null || true
+          mv $TARGET_DIR/.* . 2>/dev/null || true
+        fi
+        rm -f project.zip
+        ls -la  # Выводим список файлов для проверки в логах
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22  # Обновили до актуальной Node.js 22
 
     - name: Install dependencies
       run: npm install
@@ -45,7 +50,7 @@ jobs:
       run: npm install @capacitor/core @capacitor/cli @capacitor/android
 
     - name: Initialize Capacitor
-      run: npx cap init "My Tetris Game" "com.mycompany.tetris" --web-dir=dist
+      run: npx cap init "My Tetris Game" "com.mycompany.tetris" --web-dir=dist --confirm
 
     - name: Add Android Platform
       run: npx cap add android
