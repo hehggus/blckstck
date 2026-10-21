@@ -16,7 +16,6 @@ jobs:
     - name: Unpack ZIP Project
       run: |
         unzip project.zip
-        # Находим, куда распаковался package.json, и переносим всё в корень
         TARGET_DIR=$(find . -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;)
         if [ "$TARGET_DIR" != "." ]; then
           echo "Файлы найдены в подпапке $TARGET_DIR, переносим в корень..."
@@ -24,15 +23,14 @@ jobs:
           mv $TARGET_DIR/.* . 2>/dev/null || true
         fi
         rm -f project.zip
-        ls -la  # Выводим список файлов для проверки в логах
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22  # Обновили до актуальной Node.js 22
+        node-version: 22
 
     - name: Install dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps  # Исправили конфликт зависимостей здесь
 
     - name: Build Vite Web Project
       run: npm run build
@@ -47,7 +45,7 @@ jobs:
       uses: android-actions/setup-android@v3
 
     - name: Install Capacitor CLI & Core
-      run: npm install @capacitor/core @capacitor/cli @capacitor/android
+      run: npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
 
     - name: Initialize Capacitor
       run: npx cap init "My Tetris Game" "com.mycompany.tetris" --web-dir=dist --confirm
