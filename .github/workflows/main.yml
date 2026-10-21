@@ -18,7 +18,7 @@ jobs:
         unzip project.zip
         TARGET_DIR=$(find . -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;)
         if [ "$TARGET_DIR" != "." ]; then
-          echo "Файлы найдены in подпапке $TARGET_DIR, переносим в корень..."
+          echo "Файлы найдены в подпапке $TARGET_DIR, переносим в корень..."
           mv $TARGET_DIR/* . 2>/dev/null || true
           mv $TARGET_DIR/.* . 2>/dev/null || true
         fi
@@ -35,17 +35,17 @@ jobs:
     - name: Build Vite Web Project
       run: npm run build
 
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
-        java-version: '17'
+        java-version: '21'  # Обновили версию до Java 21, чтобы исправить ошибку компиляции
 
     - name: Install Capacitor CLI & Core
       run: npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
 
     - name: Initialize Capacitor
-      run: npx cap init "My Tetris Game" "com.mycompany.tetris" --web-dir=dist # Убрали неподдерживаемый флаг
+      run: npx cap init "My Tetris Game" "com.mycompany.tetris" --web-dir=dist
 
     - name: Add Android Platform
       run: npx cap add android
