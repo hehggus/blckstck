@@ -18,7 +18,7 @@ jobs:
         unzip project.zip
         TARGET_DIR=$(find . -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;)
         if [ "$TARGET_DIR" != "." ]; then
-          echo "Файлы найдены в подпапке $TARGET_DIR, переносим в корень..."
+          echo "Файлы найдены in подпапке $TARGET_DIR, переносим в корень..."
           mv $TARGET_DIR/* . 2>/dev/null || true
           mv $TARGET_DIR/.* . 2>/dev/null || true
         fi
@@ -45,7 +45,7 @@ jobs:
       run: npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
 
     - name: Initialize Capacitor
-      run: npx cap init "My Tetris Game" "com.mycompany.tetris" --web-dir=dist --confirm
+      run: npx cap init "My Tetris Game" "com.mycompany.tetris" --web-dir=dist # Убрали неподдерживаемый флаг
 
     - name: Add Android Platform
       run: npx cap add android
@@ -56,7 +56,6 @@ jobs:
     - name: Auto-accept Android SDK Licenses and Build APK
       run: |
         cd android
-        # Автоматически принимаем все лицензии Android SDK перед компиляцией
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
         ./gradlew assembleRelease
 
